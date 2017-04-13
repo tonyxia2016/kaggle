@@ -1,6 +1,6 @@
 import sys
 import os
-from urllib.requests import urlretrieve
+from urllib.request import urlretrieve
 import subprocess
 
 #install anaconda2 if not already installed
