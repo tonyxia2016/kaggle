@@ -1,4 +1,9 @@
 source /home/ubuntu/miniconda2/bin/activate
 conda install -y -q pandas
-conda install -y -q keras
+conda install -y -q keras=1.2.2
 conda install -y -q jupyter
+conda install -y -q matplotlib
+pip install image
+conda install -y -q scikit-learn
+conda install -y -q bcolz
+
