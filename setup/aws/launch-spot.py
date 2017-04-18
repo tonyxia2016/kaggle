@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7 -u
-"""
-copied from https://peteris.rocks/blog/script-to-launch-amazon-ec2-spot-instances/
-"""
+
+# pip install boto paramiko
+
 import argparse
 import boto, boto.ec2, boto.ec2.blockdevicemapping, boto.manage
 import paramiko
@@ -13,6 +13,7 @@ def launch_spot_instance(id, profile, spot_wait_sleep=5, instance_wait_sleep=3):
   ec2 = boto.ec2.connect_to_region(profile['region'])
 
   if not 'key_pair' in profile:
+    print ('key pair {0} does not exist'.format(profile['key_pair'][0]))
     profile['key_pair'] = ('KP-' + id, 'KP-' + id + '.pem')
     try:
       print >> sys.stderr, 'Creating key pair...',
@@ -54,7 +55,7 @@ def launch_spot_instance(id, profile, spot_wait_sleep=5, instance_wait_sleep=3):
     print >> sys.stderr, 'Requesting spot instance'
     spot_reqs = ec2.request_spot_instances(
       price=profile['price'], image_id=profile['image_id'], instance_type=profile['type'], placement=profile['region'] + profile['availability_zone'],
-      security_groups=[profile['security_group'][1]], key_name=profile['key_pair'][0], block_device_map=bdm)
+      security_groups=[profile['security_group'][1]], key_name=profile['key_pair'][0], block_device_map=bdm,instance_profile_arn='arn:aws:iam::720533437540:instance-profile/ec2_ml')
     spot_req_id = spot_reqs[0].id
 
   print >> sys.stderr, 'Waiting for launch',
@@ -115,7 +116,7 @@ def setup_instance(id, instance, file, user_name, key_name):
   stdout = session.makefile()
   try:
     for line in stdout:
-      print line.rstrip()
+      print(line.rstrip())
   except (KeyboardInterrupt, SystemExit):
     print >> sys.stderr, 'Ctrl-C, stopping'
   client.close()
@@ -125,19 +126,42 @@ def setup_instance(id, instance, file, user_name, key_name):
 
 if __name__ == '__main__':
 
+  regions = {}
+  regions['us-east-1'] = {
+    'image_id': 'ami-80861296'
+  }
+  regions['ap-southeast-1'] = {
+    'image_id': 'ami-8fcc75ec'
+  }
+
+  region_code = 'ap-southeast-1'
+  machine_type = 'c3.large'
   profiles = {
-    '15G': {
-      'region': 'eu-west-1',
+    'p2': {
+      # 'region': 'eu-west-1',
+      'region': region_code,
       'availability_zone': 'a',
-      'price': '0.05',
-      'type': 'r3.large',
-      'image_id': 'ami-ed82e39e',
+      'price': '0.2',
+      'type': machine_type,
+      'image_id': regions[region_code]['image_id'], #ubuntu 1604
       'username': 'ubuntu',
-      #'key_pair': ('AWS-EU', 'eu-key.pem'),
+      'key_pair': ('khushpreet', 'khushpreet.pem'),
       'disk_size': 20,
       'disk_delete_on_termination': True,
       'scripts': [],
-      'firewall': [ ('tcp', 22, 22, '0.0.0.0/0') ]
+      'firewall': [ ('tcp', 22, 22, '0.0.0.0/0'),('tcp', 8888, 8888, '0.0.0.0/0') ],
+      'launch_specification': {
+        'IamInstanceProfile': {
+              'Arn': 'arn:aws:iam::720533437540:instance-profile/ec2_ml',
+          }
+      },
+      'user_data': """
+      cd /home/ubuntu
+      git clone https://github.com/achinta/kaggle.git
+      cd kaggle 
+      git checkout dvc_automation
+      sudo bash dogs-vs-cats/setup.sh
+      """
     }
   }
 
@@ -161,4 +185,4 @@ if __name__ == '__main__':
       break
 
   if args.interactive:
-    print 'ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStrictHostKeyChecking=no'
+    print 'ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStric'
