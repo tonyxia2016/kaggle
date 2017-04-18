@@ -1,7 +1,7 @@
 current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #complete the commnon setup (install anaconda etc etc)
-#bash $current_dir/../setup/setup.sh
+bash $current_dir/../setup/setup.sh
 # activate conda 
 source /home/ubuntu/miniconda2/bin/activate
 
