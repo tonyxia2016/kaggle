@@ -1,12 +1,19 @@
-#not needed as we included them in git. 
-#wget https://raw.githubusercontent.com/fastai/courses/master/deeplearning1/nbs/vgg16.py
-#wget https://raw.githubusercontent.com/fastai/courses/master/deeplearning1/nbs/vgg16bn.py
-#wget https://raw.githubusercontent.com/fastai/courses/master/deeplearning1/nbs/utils.py
-sudo ../setup.sh
-mkdir -p kaggle-data
-mkdir -p data
+current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+#complete the commnon setup (install anaconda etc etc)
+#bash $current_dir/../setup/setup.sh
+# activate conda 
+source /home/ubuntu/miniconda2/bin/activate
+
+mkdir -p $current_dir/kaggle-data
+chown -R ubuntu $current_dir/kaggle-data
+mkdir -p $current_dir/data
+chown -R ubuntu $current_dir/kaggle-data
+
 cd kaggle-data
-aws s3 sync salt://aj-kaggle/dogs-vs-cats .
+aws s3 sync s3://aj-kaggle/dogs-vs-cats .
 unzip train.zip
 unzip test1.zip
 mv train ../data
+mv test1 ../data
+
