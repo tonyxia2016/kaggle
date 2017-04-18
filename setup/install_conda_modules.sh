@@ -7,4 +7,5 @@ conda install -y -q matplotlib
 pip install image
 conda install -y -q scikit-learn
 conda install -y -q bcolz
+pip install --upgrade awscli
 
