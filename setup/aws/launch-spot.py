@@ -105,7 +105,7 @@ def connect_to_instance(ip, username, key_filename, timeout=10):
   return client
 
 def setup_instance(id, instance, file, user_name, key_name):
-  script = open(file, 'r').read().replace('\r', '')
+  script = open(file, 'r').read().replace('\n', ';')
 
   client = connect_to_instance(instance.ip_address, user_name, key_name)
   session = client.get_transport().open_session()
@@ -148,20 +148,13 @@ if __name__ == '__main__':
       'key_pair': ('khushpreet', 'khushpreet.pem'),
       'disk_size': 20,
       'disk_delete_on_termination': True,
-      'scripts': [],
+      'scripts': ['startup_script.sh'],
       'firewall': [ ('tcp', 22, 22, '0.0.0.0/0'),('tcp', 8888, 8888, '0.0.0.0/0') ],
       'launch_specification': {
         'IamInstanceProfile': {
               'Arn': 'arn:aws:iam::720533437540:instance-profile/ec2_ml',
           }
       },
-      'user_data': """
-      cd /home/ubuntu
-      git clone https://github.com/achinta/kaggle.git
-      cd kaggle 
-      git checkout dvc_automation
-      sudo bash dogs-vs-cats/setup.sh
-      """
     }
   }
 
@@ -185,4 +178,4 @@ if __name__ == '__main__':
       break
 
   if args.interactive:
-    print 'ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStric'
+    print('ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStrictHostKeyChecking=no')
