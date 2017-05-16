@@ -1,6 +1,7 @@
 #install salt
 current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 apt-get -y install salt-minion
+apt-get -y install unzip
 mkdir -p /srv/salt
 
 #install python dependencies

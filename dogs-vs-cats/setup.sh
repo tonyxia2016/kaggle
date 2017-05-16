@@ -8,7 +8,7 @@ source /home/ubuntu/miniconda2/bin/activate
 mkdir -p $current_dir/kaggle-data
 chown -R ubuntu $current_dir/kaggle-data
 mkdir -p $current_dir/data
-chown -R ubuntu $current_dir/kaggle-data
+chown -R ubuntu $current_dir/data
 
 cd kaggle-data
 aws s3 sync s3://aj-kaggle/dogs-vs-cats .
