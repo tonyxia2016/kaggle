@@ -20,4 +20,7 @@ This can also be given as the startup script when we launch the instance.
 cd ~
 git clone https://github.com/fastai/courses.git
 sudo bash courses/setup/install-gpu.sh
+
+#generate jupyter notebook configuration (http://jupyter-notebook.readthedocs.io/en/latest/public_server.html#notebook-server-security) and enable it for all ips
+jupyter notebook --generate-config
 ```
