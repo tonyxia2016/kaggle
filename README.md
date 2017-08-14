@@ -21,6 +21,13 @@ cd ~
 git clone https://github.com/fastai/courses.git
 sudo bash courses/setup/install-gpu.sh
 
+#install a tensorflow version which detects the gpu - https://anaconda.org/anaconda/tensorflow-gpu
+sudo apt-get install libcupti-dev
+conda install -c anaconda tensorflow-gpu
+
+#check that the gpu is detected
+
 #generate jupyter notebook configuration (http://jupyter-notebook.readthedocs.io/en/latest/public_server.html#notebook-server-security) and enable it for all ips
 jupyter notebook --generate-config
+
 ```
