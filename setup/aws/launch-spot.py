@@ -67,7 +67,10 @@ def launch_spot_instance(id, profile, spot_wait_sleep=5, instance_wait_sleep=3):
       spot_req.add_tag('Name', id)
       spot_tag_added = True
     if spot_req.state == 'failed':
-      raise Exception('Spot request failed')
+      # print(dir(spot_req))
+      raise Exception('spto request failed')
+      print('Spot request failed - {0}'.format(spot_req.status))
+      sys.exit(0)
     instance_id = spot_req.instance_id
     if not instance_id:
       print >> sys.stderr, '.',
@@ -128,25 +131,28 @@ if __name__ == '__main__':
 
   regions = {}
   regions['us-east-1'] = {
-    'image_id': 'ami-80861296'
+    # 'image_id': 'ami-80861296'
+    # 'image_id': 'ami-7b30a26d' #ajay private image
+    # 'image_id': 'ami-35ebd84e' #deep learning public image https://aws.amazon.com/marketplace/fulfillment?productId=8011986f-8b40-4ce3-9eed-1f877ce4d941&ref_=dtl_psb_continue&region=us-east-1
+    'image_id': 'ami-81526efa' #deep learning private image https://aws.amazon.com/marketplace/fulfillment?productId=8011986f-8b40-4ce3-9eed-1f877ce4d941&ref_=dtl_psb_continue&region=us-east-1
   }
   regions['ap-southeast-1'] = {
     'image_id': 'ami-8fcc75ec'
   }
 
-  region_code = 'ap-southeast-1'
-  machine_type = 'c3.large'
+  region_code = 'us-east-1'
+  machine_type = 'p2.xlarge'
   profiles = {
     'p2': {
       # 'region': 'eu-west-1',
       'region': region_code,
       'availability_zone': 'a',
-      'price': '0.2',
+      'price': '0.22',
       'type': machine_type,
       'image_id': regions[region_code]['image_id'], #ubuntu 1604
       'username': 'ubuntu',
       'key_pair': ('khushpreet', 'khushpreet.pem'),
-      'disk_size': 20,
+      'disk_size': 60,
       'disk_delete_on_termination': True,
       'scripts': ['startup_script.sh'],
       'firewall': [ ('tcp', 22, 22, '0.0.0.0/0'),('tcp', 8888, 8888, '0.0.0.0/0') ],
@@ -162,7 +168,7 @@ if __name__ == '__main__':
   parser.add_argument('-n', '--name', help='Name', required=True)
   parser.add_argument('-p', '--profile', help='Profile', default=profiles.keys()[0], choices=profiles.keys())
   parser.add_argument('-s', '--script', help='Script path', action='append', default=[])
-  parser.add_argument('-i', '--interactive', help='Connect to SSH', action='store_true')
+  # parser.add_argument('-i', '--interactive', help='Connect to SSH', action='store_true')
   args = parser.parse_args()
 
   profile = profiles[args.profile]
@@ -177,5 +183,5 @@ if __name__ == '__main__':
     if not setup_instance(id=args.name, instance=instance, file=script, user_name=profile['username'], key_name=profile['key_pair'][1]):
       break
 
-  if args.interactive:
-    print('ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStrictHostKeyChecking=no')
+  # if args.interactive:
+  #   print('ssh ' + profile['username'] + '@' + instance.ip_address + ' -i ' + profile['key_pair'][1] + ' -oStrictHostKeyChecking=no')
